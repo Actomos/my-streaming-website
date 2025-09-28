@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streamify - Movies, TV Shows & More</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+          body {
+            margin: 0;
+            font-family: "Roboto", Arial, sans-serif;
+            background: #181818;
+            color: #fff;
+          }
+          header {
+            background: #141414;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 2px;
+          }
+          nav {
+            display: flex;
+            gap: 2rem;
+          }
+          nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+          }
+          nav a:hover {
+            color: #e50914;
+          }
+          .search-bar {
+            background: #222;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: #fff;
+            margin-left: 2rem;
+          }
+          main {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+          }
+          .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #e50914;
+          }
+          .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+          }
+          .card {
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s;
+          }
+          .card:hover {
+            transform: scale(1.05);
+          }
+          .card-img {
+            width: 100%;
+            height: 260px;
+            background: #333;
+            object-fit: cover;
+          }
+          .card-info {
+            padding: 1rem;
+          }
+          .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+          }
+          .card-meta {
+            font-size: 0.9rem;
+            color: #aaa;
+          }
+          footer {
+            background: #141414;
+            color: #aaa;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+          }
+          .sponsors-home {
+      /* sponsors-home removed */
+          }
+          .sponsors-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #e50914;
+            margin-bottom: 0.5rem;
+          }
+          .sponsor-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+          }
+          .sponsor-item {
+            background: #333;
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 4px #0001;
+            transition: background 0.2s;
+          }
+          .sponsor-item:hover {
+            background: #e50914;
+            color: #fff;
+          }
+          }
+          @media (max-width: 600px) {
+            main {
+              padding: 1rem;
+            }
+            .content-grid {
+              grid-template-columns: 1fr 1fr;
+            }
+          }
+    </style>
+    <script src="mediaRender.js"></script>
+  </head>
+  <body>
+    <header>
+      <div style="display:flex;align-items:center;gap:1.2rem;">
+        <div class="logo">Streamify</div>
+        <a href="anime.html" class="anime-btn" style="background:#e50914;color:#fff;padding:0.5rem 1.2rem;border-radius:8px;font-weight:600;text-decoration:none;transition:background 0.2s;">Anime</a>
+      </div>
+      <nav>
+        <a href="#movies">Movies</a>
+        <a href="#tvshows">TV Shows</a>
+        <a href="#more">More</a>
+      </nav>
+      <input class="search-bar" type="text" placeholder="Search..." />
+    </header>
+    <section id="banner" style="width: 100%; margin-bottom: 2rem"></section>
+    <section
+      id="top10"
+      style="
+        width: 100%;
+        max-width: 1200px;
+        margin: 2rem auto 1rem auto;
+        padding: 1rem 2rem;
+        background: #222;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px #0003;
+      "
+    >
+      <h2
+        style="
+          color: #e50914;
+          font-size: 2rem;
+          margin-bottom: 1.2rem;
+          text-align: center;
+        "
+      >
+        Top 10 Content of the Day
+      </h2>
+      <div
+        id="top10-list"
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 1.5rem;
+        "
+      ></div>
+    </section>
+    <main>
+      <section id="movies">
+        <div class="section-title">Movies</div>
+        <div class="content-grid" id="movies-grid"></div>
+      </section>
+      <section id="tvshows">
+        <div class="section-title">TV Shows</div>
+        <div class="content-grid" id="tvshows-grid"></div>
+      </section>
+      <section id="more">
+        <div class="section-title">More</div>
+        <div class="content-grid" id="more-grid">
+          <div style="color: #aaa">More features coming soon.</div>
+        </div>
+      </section>
+    </main>
+    <footer>&copy; 2025 Streamify. All rights reserved.</footer>
+    <div
+      id="playerModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        id="playerContainer"
+        style="
+          position: relative;
+          width: 80vw;
+          max-width: 900px;
+          height: 45vw;
+          max-height: 500px;
+          margin: auto;
+          background: #000;
+          border-radius: 12px;
+          box-shadow: 0 0 30px #000;
+        "
+      >
+        <span
+          id="closePlayer"
+          style="
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 10;
+          "
+          >&times;</span
+        >
+        <div id="iframeWrapper" style="width: 100%; height: 100%"></div>
+      </div>
+    </div>
+    <script>
+      const TMDB_API_KEY = "4c48b115fd12804fdaf654f1abc7d54a";
+      const IMDB_API_KEY = "4c48b115fd12804fdaf654f1abc7d54a"; // IMDb API key
+      const searchInput = document.querySelector(".search-bar");
+
+      // Initial load: popular movies and TV shows
+      loadPopular();
+      // Load banner with popular movies and TV shows
+      Promise.all([
+        fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
+        ).then((res) => res.json()),
+        fetch(
+          `https://api.themoviedb.org/3/tv/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
+        ).then((res) => res.json()),
+      ]).then(([movieData, tvData]) => {
+        // Add media_type for correct player navigation
+        const movies = (movieData.results || []).map((m) => ({
+          ...m,
+          media_type: "movie",
+        }));
+        const shows = (tvData.results || []).map((s) => ({
+          ...s,
+          media_type: "tv",
+        }));
+        const allContent = movies.concat(shows);
+        if (window.renderBanner) {
+          renderBanner(allContent);
+        }
+      });
+
+      function loadPopular() {
+        fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
+        )
+          .then((res) => res.json())
+          .then((data) => renderMovies(data.results));
+        fetch(
+          `https://api.themoviedb.org/3/tv/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
+        )
+          .then((res) => res.json())
+          .then((data) => renderTVShows(data.results));
+      }
+
+      // Fetch and render Top 10 Content of the Day from TMDB trending endpoint
+      function loadTop10Content() {
+        fetch(
+          `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_API_KEY}`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            let items = (data.results || []).slice(0, 10);
+            const list = document.getElementById("top10-list");
+            list.innerHTML = "";
+            items.forEach((item, idx) => {
+              const title = item.title || item.name || "Untitled";
+              const year = (
+                item.release_date ||
+                item.first_air_date ||
+                ""
+              ).substring(0, 4);
+              const image = item.poster_path
+                ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                : item.backdrop_path
+                ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
+                : "https://via.placeholder.com/140x210?text=No+Image";
+              const card = document.createElement("div");
+              card.className = "top10-card";
+              card.style =
+                "background:#181818;border-radius:10px;box-shadow:0 2px 8px #0003;padding:1rem;text-align:center;";
+              card.innerHTML = `
+                <div style='font-size:2.2rem;font-weight:bold;color:#e50914;margin-bottom:0.5rem;'>#${
+                  idx + 1
+                }</div>
+                <img
+                  src='${image}'
+                  alt='${title}'
+                  style='width:100%;max-width:140px;border-radius:8px;box-shadow:0 2px 8px #000;margin-bottom:0.7rem;'
+                />
+                <div style='font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:0.4rem;'>${title}</div>
+                <div style='font-size:0.95rem;color:#ccc;'>${year}</div>
+              `;
+              card.onclick = () => {
+                if (item.media_type === "movie") {
+                  window.location.href = `player.html?type=movie&id=${item.id}`;
+                } else if (item.media_type === "tv") {
+                  window.location.href = `player.html?type=tv&id=${item.id}&season=1&episode=1`;
+                }
+              };
+              list.appendChild(card);
+            });
+          });
+      }
+
+      // Call on page load
+      loadTop10Content();
+
+      // Search handler
+      searchInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          doSearch(this.value.trim());
+        }
+      });
+      searchInput.addEventListener("input", function (e) {
+        if (this.value.trim() === "") {
+          loadPopular();
+        }
+      });
+
+      function doSearch(query) {
+        if (!query) {
+          loadPopular();
+          return;
+        }
+        // Search movies
+        fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(
+            query
+          )}&page=1`
+        )
+          .then((res) => res.json())
+          .then((data) => renderMovies(data.results));
+        // Search TV shows
+        fetch(
+          `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(
+            query
+          )}&page=1`
+        )
+          .then((res) => res.json())
+          .then((data) => renderTVShows(data.results));
+      }
+
+      function renderMovies(movies) {
+        const grid = document.getElementById("movies-grid");
+        grid.innerHTML = "";
+        if (!movies || movies.length === 0) {
+          grid.innerHTML =
+            '<div style="color:#aaa;text-align:center;">No movies found.</div>';
+          return;
+        }
+        movies.forEach((movie) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img class="card-img" src="https://image.tmdb.org/t/p/w500${
+              movie.poster_path
+            }" alt="${movie.title}" />
+            <div class="card-info">
+              <div class="card-title">${movie.title}</div>
+              <div class="card-meta">${
+                movie.release_date ? movie.release_date.substring(0, 4) : ""
+              }</div>
+            </div>
+          `;
+          card.onclick = () => {
+            window.location.href = `player.html?type=movie&id=${movie.id}`;
+          };
+          grid.appendChild(card);
+        });
+      }
+
+      function renderTVShows(shows) {
+        const grid = document.getElementById("tvshows-grid");
+        grid.innerHTML = "";
+        if (!shows || shows.length === 0) {
+          grid.innerHTML =
+            '<div style="color:#aaa;text-align:center;">No TV shows found.</div>';
+          return;
+        }
+        shows.forEach((show) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img class="card-img" src="https://image.tmdb.org/t/p/w500${
+              show.poster_path
+            }" alt="${show.name}" />
+            <div class="card-info">
+              <div class="card-title">${show.name}</div>
+              <div class="card-meta">${
+                show.first_air_date ? show.first_air_date.substring(0, 4) : ""
+              }</div>
+            </div>
+          `;
+          // Play first episode of first season by default
+          card.onclick = () => {
+            window.location.href = `player.html?type=tv&id=${show.id}&season=1&episode=1`;
+          };
+          grid.appendChild(card);
+        });
+      }
+
+      function openPlayerNewTab(type, id, season = 1, episode = 1) {
+        let src = "";
+        if (type === "movie") {
+          src = `https://player.videasy.net/movie/${id}?color=e50914&overlay=true`;
+        } else if (type === "tv") {
+          src = `https://player.videasy.net/tv/${id}/${season}/${episode}?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=e50914`;
+        }
+        window.open(src, "_blank");
+      }
+
+      document.getElementById("closePlayer").onclick = function () {
+        document.getElementById("playerModal").style.display = "none";
+        document.getElementById("iframeWrapper").innerHTML = "";
+      };
+
+      // Optional: Close modal on background click
+      document.getElementById("playerModal").onclick = function (e) {
+        if (e.target === this) {
+          this.style.display = "none";
+          document.getElementById("iframeWrapper").innerHTML = "";
+        }
+      };
+    </script>
+  </body>
+</html>
