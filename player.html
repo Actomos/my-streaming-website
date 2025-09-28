@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streamify Player</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+          body {
+            margin: 0;
+            font-family: "Roboto", Arial, sans-serif;
+            background: #181818;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+          }
+          header {
+            background: #141414;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 2px;
+          }
+          .back-btn {
+            color: #fff;
+            background: #e50914;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 1rem;
+          }
+          main {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            padding: 2rem;
+            align-items: flex-start;
+            justify-content: center;
+          }
+          .player-column {
+            flex: 2;
+            min-width: 0;
+            max-width: 900px;
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 0 30px #000;
+            position: relative;
+            padding: 1rem;
+          }
+          .responsive-iframe {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+          }
+          .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
+          }
+          .sidebar {
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            background: #222;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #000;
+            padding: 1.5rem 1rem;
+            color: #fff;
+            overflow-y: auto;
+            max-height: 700px;
+          }
+          .sponsors-home {
+      /* sponsors-home removed */
+          }
+          .sponsors-title {
+      /* sponsors-title removed */
+          }
+          .sponsor-list {
+      /* sponsor-list removed */
+          }
+          .sponsor-item {
+      /* sponsor-item removed */
+          }
+          .sponsor-item:hover {
+      /* sponsor-item:hover removed */
+          }
+          .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e50914;
+            margin-bottom: 1rem;
+          }
+          .sidebar-content {
+            color: #ccc;
+            font-size: 1rem;
+          }
+          .sponsors {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: linear-gradient(90deg, #222 80%, #e50914 100%);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #0002;
+            text-align: center;
+          }
+          .sponsors-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #e50914;
+            margin-bottom: 0.5rem;
+          }
+          .sponsor-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+          }
+          .sponsor-item {
+            background: #333;
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 4px #0001;
+            transition: background 0.2s;
+          }
+          .sponsor-item:hover {
+            background: #e50914;
+            color: #fff;
+          }
+          }
+          @media (max-width: 900px) {
+            main {
+              flex-direction: column;
+              gap: 1rem;
+              padding: 1rem;
+            }
+            .sidebar {
+              max-width: 100%;
+              width: 100%;
+              margin-top: 1rem;
+              max-height: 300px;
+            }
+            .player-column {
+              max-width: 100%;
+              width: 100%;
+            }
+          }
+          footer {
+            background: #141414;
+            color: #aaa;
+            text-align: center;
+            padding: 1rem 0;
+          }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button class="back-btn" onclick="window.history.back()">
+        &#8592; Back
+      </button>
+      <div class="logo">Streamify</div>
+    </header>
+    <main>
+      <div class="player-column">
+        <div class="responsive-iframe" id="playerArea"></div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-title">Related Content</div>
+        <div class="sidebar-content" id="relatedContent">
+          <!-- Related content will appear here -->
+          <div style="color: #aaa">
+            More info, cast, recommendations, and extras will be shown here.
+          </div>
+        </div>
+      </aside>
+    </main>
+    <footer>&copy; 2025 Streamify. All rights reserved.</footer>
+    <script>
+      // Get params from URL
+      function getQueryParams() {
+        const params = {};
+        window.location.search.replace(
+          /\??(?:([^=]+)=([^&]*)&?)/g,
+          function (_, k, v) {
+            params[k] = decodeURIComponent(v);
+          }
+        );
+        return params;
+      }
+      const TMDB_API_KEY = "4c48b115fd12804fdaf654f1abc7d54a";
+      const params = getQueryParams();
+      let src = "";
+      if (params.type === "movie" && params.id) {
+        src = `https://player.videasy.net/movie/${params.id}?color=e50914&overlay=true`;
+        fetchMovieDetails(params.id);
+      } else if (
+        params.type === "tv" &&
+        params.id &&
+        params.season &&
+        params.episode
+      ) {
+        src = `https://player.videasy.net/tv/${params.id}/${params.season}/${params.episode}?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=e50914`;
+        fetchTVDetails(params.id);
+      } else {
+        document.getElementById("playerArea").innerHTML =
+          '<div style="color:#fff;text-align:center;padding:2rem;">Invalid player parameters.</div>';
+      }
+      if (src) {
+        document.getElementById(
+          "playerArea"
+        ).innerHTML = `<iframe src="${src}" allowfullscreen allow="encrypted-media"></iframe>`;
+      }
+
+      // Fetch and display movie details and cast
+      function fetchMovieDetails(id) {
+        Promise.all([
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}&language=en-US`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_API_KEY}`
+          ).then((res) => res.json()),
+        ]).then(([details, credits]) => {
+          renderSidebar({
+            title: details.title,
+            overview: details.overview,
+            poster: details.poster_path,
+            cast: credits.cast,
+          });
+        });
+      }
+
+      // Fetch and display TV show details and cast
+      function fetchTVDetails(id) {
+        Promise.all([
+          fetch(
+            `https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_API_KEY}&language=en-US`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/tv/${id}/credits?api_key=${TMDB_API_KEY}`
+          ).then((res) => res.json()),
+        ]).then(([details, credits]) => {
+          renderSidebar({
+            title: details.name,
+            overview: details.overview,
+            poster: details.poster_path,
+            cast: credits.cast,
+          });
+        });
+      }
+
+      // Render sidebar content
+      function renderSidebar({ title, overview, poster, cast }) {
+        const sidebar = document.getElementById("relatedContent");
+        sidebar.innerHTML = `
+          <div style="display:flex;align-items:flex-start;gap:1rem;">
+            ${
+              poster
+                ? `<img src="https://image.tmdb.org/t/p/w185${poster}" alt="${title}" style="border-radius:8px;box-shadow:0 2px 8px #000;width:90px;">`
+                : ""
+            }
+            <div>
+              <div style="font-size:1.1rem;font-weight:bold;color:#fff;margin-bottom:0.5rem;">${title}</div>
+              <div style="font-size:0.95rem;color:#ccc;margin-bottom:1rem;">${
+                overview || "No description available."
+              }</div>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <div style="font-weight:bold;color:#e50914;margin-bottom:0.5rem;">Cast</div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+              ${
+                cast && cast.length
+                  ? cast
+                      .slice(0, 8)
+                      .map(
+                        (actor) =>
+                          `<span style=\"background:#333;padding:0.3rem 0.7rem;border-radius:6px;font-size:0.95rem;\">${actor.name}</span>`
+                      )
+                      .join("")
+                  : '<span style="color:#aaa;">No cast info.</span>'
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      // Fetch and render Top 10 Content of the Day from IMDb API
+      const IMDB_API_KEY = "YOUR_IMDB_API_KEY"; // Replace with your actual IMDb API key
+      function loadTop10Content() {
+        // Example IMDb trending endpoint (replace with actual endpoint and key)
+        fetch(`https://imdb-api.com/en/API/MostPopularMovies/${IMDB_API_KEY}`)
+          .then((res) => res.json())
+          .then((data) => {
+            // Combine movies and TV shows if you want both (use MostPopularTVs endpoint too)
+            let items = (data.items || []).slice(0, 10);
+            const list = document.getElementById("top10-list");
+            list.innerHTML = "";
+            items.forEach((item, idx) => {
+              const card = document.createElement("div");
+              card.className = "top10-card";
+              card.style =
+                "background:#181818;border-radius:10px;box-shadow:0 2px 8px #0003;padding:1rem;text-align:center;";
+              card.innerHTML = `
+          <div style='font-size:2.2rem;font-weight:bold;color:#e50914;margin-bottom:0.5rem;'>#${
+            idx + 1
+          }</div>
+          <img src='${item.image}' alt='${
+                item.title
+              }' style='width:100%;max-width:140px;border-radius:8px;box-shadow:0 2px 8px #000;margin-bottom:0.7rem;'>
+          <div style='font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:0.4rem;'>${
+            item.title
+          }</div>
+          <div style='font-size:0.95rem;color:#ccc;'>${item.year || ""}</div>
+        `;
+              card.onclick = () => {
+                window.location.href = `player.html?type=movie&id=${item.id}`;
+              };
+              list.appendChild(card);
+            });
+          });
+      }
+      // Call on page load
+      loadTop10Content();
+    </script>
+  </body>
+</html>
